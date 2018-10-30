@@ -1,0 +1,5 @@
+10
+3
+1 bb b
+2 a aab
+3 abbba bb
