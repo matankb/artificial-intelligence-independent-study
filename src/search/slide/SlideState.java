@@ -4,7 +4,7 @@ import search.State;
 
 import java.util.Arrays;
 
-public class SlideState extends State {
+public class SlideState implements State {
 
     private int[][] state;
 

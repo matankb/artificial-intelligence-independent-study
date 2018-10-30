@@ -7,11 +7,12 @@ import search.State;
 
 import java.util.ArrayList;
 
-public class PostCorrespondenceProblem extends Problem {
+public class PostCorrespondenceProblem implements Problem {
 
     private String[][] dominoes;
 
     public PostCorrespondenceProblem(String[][] dominoes) {
+        super();
         this.dominoes = dominoes;
     }
 
@@ -30,8 +31,8 @@ public class PostCorrespondenceProblem extends Problem {
     @Override
     public ArrayList<Action> getActions(Node n) {
         ArrayList<Action> actions = new ArrayList<>();
-        for (int i = 0; i < dominoes.length; i++) {
-            PostCorrespondenceAction action = new PostCorrespondenceAction(dominoes[i]);
+        for (String[] domino: dominoes) {
+            PostCorrespondenceAction action = new PostCorrespondenceAction(domino);
             PostCorrespondenceState nextState = (PostCorrespondenceState) result(n.getState(), action);
             String[] strings = nextState.getFullStrings();
             if (strings[0].startsWith(strings[1]) || strings[1].startsWith(strings[0])) {

@@ -3,8 +3,8 @@ import java.util.Comparator;
 
 public class PriorityQueue<T> {
 
-    private ArrayList<T> queue;
-    private Comparator<T> comparator;
+    final private ArrayList<T> queue;
+    final private Comparator<T> comparator;
 
     public PriorityQueue(Comparator<T> comparable) {
         this.queue = new ArrayList<>();

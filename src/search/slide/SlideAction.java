@@ -2,11 +2,11 @@ package search.slide;
 
 import search.Action;
 
-public class SlideAction extends Action {
+public class SlideAction implements Action {
 
     public enum directions { LEFT, RIGHT, UP, DOWN }
 
-    private directions direction;
+    final private directions direction;
 
     SlideAction(directions d) {
         this.direction = d;

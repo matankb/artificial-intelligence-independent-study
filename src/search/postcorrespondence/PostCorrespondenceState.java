@@ -4,15 +4,15 @@ import search.State;
 
 import java.util.ArrayList;
 
-public class PostCorrespondenceState extends State {
+public class PostCorrespondenceState implements State {
 
     private ArrayList<String[]> state;
 
-    public PostCorrespondenceState(ArrayList<String[]> state) {
+    PostCorrespondenceState(ArrayList<String[]> state) {
         this.state = state;
     }
 
-    public ArrayList<String[]> getState() {
+    ArrayList<String[]> getState() {
         return state;
     }
     public String toString() {
@@ -20,7 +20,7 @@ public class PostCorrespondenceState extends State {
         return strings[0] + " " + strings[1];
     }
 
-    public String[] getFullStrings() {
+    String[] getFullStrings() {
         StringBuilder topString = new StringBuilder();
         StringBuilder bottomString = new StringBuilder();
         ArrayList<String[]> strings = state;

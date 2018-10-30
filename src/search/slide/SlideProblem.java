@@ -8,7 +8,7 @@ import search.State;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SlideProblem extends Problem {
+public class SlideProblem implements Problem {
 
     private int[][] initialState = {
             {0, 0, 0, 0},
@@ -101,15 +101,6 @@ public class SlideProblem extends Problem {
             }
         }
         return new int[]{blankRow, blankCol};
-    }
-
-    private boolean arrayContains(int[] arr, int num) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == num) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

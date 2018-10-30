@@ -2,15 +2,14 @@ package search.postcorrespondence;
 
 import search.Action;
 
-public class PostCorrespondenceAction extends Action {
+public class PostCorrespondenceAction implements Action {
 
     private String[] domino;
 
-    public PostCorrespondenceAction(String[] domino) {
+    PostCorrespondenceAction(String[] domino) {
         this.domino = domino;
     }
-
-    public String[] getDomino() {
+    String[] getDomino() {
         return domino;
     }
 

@@ -1,7 +1,7 @@
 package search;
 
-public abstract class Action {
+public interface Action {
 
-    abstract public String toString();
+    public String toString();
 
 }

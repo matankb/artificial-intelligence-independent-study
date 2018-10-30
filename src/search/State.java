@@ -1,7 +1,7 @@
 package search;
 
-abstract public class State {
+public interface State {
 
-    abstract public String toString();
+    public String toString();
 
 }
