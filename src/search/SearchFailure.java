@@ -1,13 +1,6 @@
 package search;
 
-public class SearchFailure extends Exception {
-    private int statesGenerated = 0;
-    public SearchFailure(int statesGenerated) {
-        this.statesGenerated = statesGenerated;
-    }
-    public SearchFailure() {}
-
-    public int getStatesGenerated() {
-        return statesGenerated;
-    }
+public class SearchFailure extends SearchException {
+    SearchFailure() {super();}
+    SearchFailure(int statesGenerated) {super(statesGenerated);}
 }
