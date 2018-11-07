@@ -18,24 +18,22 @@ public class PostCorrespondenceProblem implements Problem {
 
     @Override
     public State getInitialState() {
-        return new PostCorrespondenceState(new ArrayList<String[]>());
+        return new PostCorrespondenceState(new String[]{"", ""}); // empty dominoes
     }
 
     @Override
     public boolean goalTest(State s) {
-        PostCorrespondenceState state = (PostCorrespondenceState) s;
-        String[] strings = state.getFullStrings();
-        return state.getState().size() > 0 && strings[0].equals(strings[1]);
+        String[] strings = ((PostCorrespondenceState) s).getState();
+        return !strings[0].isEmpty() && strings[0].equals(strings[1]);
     }
 
     @Override
     public ArrayList<Action> getActions(Node n) {
         ArrayList<Action> actions = new ArrayList<>();
         for (String[] domino: dominoes) {
-            PostCorrespondenceAction action = new PostCorrespondenceAction(domino);
-            PostCorrespondenceState nextState = (PostCorrespondenceState) result(n.getState(), action);
-            String[] strings = nextState.getFullStrings();
-            if (strings[0].startsWith(strings[1]) || strings[1].startsWith(strings[0])) {
+            String[] newDominoes = addDomino(((PostCorrespondenceState) n.getState()).getState(), domino);
+            if (newDominoes[1].startsWith(newDominoes[0]) || newDominoes[0].startsWith(newDominoes[1])) {
+                PostCorrespondenceAction action = new PostCorrespondenceAction(domino);
                 actions.add(action);
             }
         }
@@ -45,14 +43,21 @@ public class PostCorrespondenceProblem implements Problem {
     @Override
     public State result(State parentState, Action action) {
         PostCorrespondenceState state = (PostCorrespondenceState) parentState;
-        ArrayList<String[]> newDominoes = new ArrayList<String[]>(state.getState());
-        newDominoes.add(((PostCorrespondenceAction) action).getDomino());
+        String[] addedDomino = ((PostCorrespondenceAction) action).getDomino();
+        String[] newDominoes = addDomino(state.getState(), addedDomino);
         return new PostCorrespondenceState(newDominoes);
     }
 
     @Override
     public int stepCost(State parentState, Action action) {
         return 0;
+    }
+
+    private String[] addDomino(String[] dominoes, String[] newDominoes) {
+        return new String[]{
+            dominoes[0] + newDominoes[0],
+            dominoes[1] + newDominoes[1],
+        };
     }
 
 }
