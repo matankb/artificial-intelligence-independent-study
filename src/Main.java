@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 interface RunnableSearch {
-    Node runSearch() throws SearchFailure, SearchCutoff;
+    Solution runSearch() throws SearchFailure, SearchCutoff;
 }
 
 class Main {
 
-    // Demonstrates the Breadth-First, Depth-First, Depth-Limited, and Iterative-Deepening Search
-    // Using the Slide Problem and the Post Correspondence Problem
-    // (the post correspondence problem receives input from input/postcorrespondence.txt, as described in the assignment)
+
     public static void main(String[] args) {
         ArrayList<String> lines = getInputFileLines("postcorrespondence.txt");
         int maximumDepth = Integer.parseInt(lines.get(0));
@@ -31,36 +29,50 @@ class Main {
 
     // runs all search algorithms on the problem, printing results for each one
     private static void runSearches(String problemName, Problem problem, int maxDepth, int maxIterativeDepth) {
-        System.out.println(problemName + ":");
+        System.out.println(problemName.toUpperCase() + ":");
         Searcher searcher = new Searcher(problem);
 
+        RunnableSearch iterativeDeepeningSearch = () -> searcher.iterativeDeepeningSearch(maxIterativeDepth);
         RunnableSearch breadthSearch = searcher::breadthSearch;
         RunnableSearch depthSearch = searcher::depthSearch;
-        RunnableSearch depthLimitedSearch = () -> searcher.depthLimitedSearch(maxDepth);
-        RunnableSearch iterativeDeepeningSearch = () -> searcher.iterativeDeepeningSearch(maxIterativeDepth);
 
+        printSearch("Iterative Deepening Search", iterativeDeepeningSearch);
         printSearch("Breadth-First Search", breadthSearch);
         printSearch("Depth-First Search", depthSearch);
-        printSearch("Depth-Limited Search", depthLimitedSearch);
-        printSearch("Iterative Deepening Search", iterativeDeepeningSearch);
         System.out.println("------------");
     }
 
     private static void printSearch(String name, RunnableSearch search) {
         try {
-            Node result = search.runSearch();
-            Node node = result;
+            Solution solution = search.runSearch();
+            Node node = solution.getNode();
             StringBuilder steps = new StringBuilder();
             while (node.getParent() != null) {
                 steps.append(node.getAction()).append(" ");
                 node = node.getParent();
             }
             System.out.println("Solution found for \033[0;1m" + name + "\033[0;0m! Steps: " + steps);
-            System.out.println(result.getState());
+            System.out.println(solution.getNode().getState());
+            if (solution.getStatesGeneratedPerLevel() != null) { // special case for recursive DLS printing
+                printRecursiveDLSLevels(solution);
+            }
         } catch (SearchCutoff e) {
             System.out.println("Search cutoff reached for " + name);
         } catch (SearchFailure e) {
             System.out.println("No solution found for " + name);
+        }
+    }
+
+    private static void printRecursiveDLSLevels(Solution solution) {
+        int[] statesGenerated = solution.getStatesGeneratedPerLevel();
+        int prevStatesGenerated = 0;
+        for (int j = 0; j < statesGenerated.length; j++) {
+            int currentStatesGenerated = statesGenerated[j] - prevStatesGenerated;
+            if (currentStatesGenerated < 0) {
+                continue; // solution found in previous iterations
+            }
+            System.out.println("Level " + j + ": " + currentStatesGenerated + " states generated.");
+            prevStatesGenerated = statesGenerated[j];
         }
     }
 

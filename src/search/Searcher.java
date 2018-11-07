@@ -11,10 +11,10 @@ public class Searcher {
         this.problem = problem;
     }
 
-    public Node breadthSearch() throws SearchFailure {
+    public Solution breadthSearch() throws SearchFailure {
         Node node = new Node(this.problem.getInitialState(), null, null, 0);
         if (problem.goalTest(node.getState())) {
-            return node;
+            return new Solution(node);
         }
         LinkedList<Node> frontier = new LinkedList<Node>();
         frontier.add(node);
@@ -30,7 +30,7 @@ public class Searcher {
                 Node child = this.childNode(node, action);
                 if (!frontier.contains((child)) && !explored.contains(child.getState())) {
                     if (problem.goalTest(child.getState())) {
-                        return child;
+                        return new Solution(child);
                     }
                     frontier.add(child);
                 }
@@ -38,10 +38,10 @@ public class Searcher {
         }
     }
 
-    public Node depthSearch() throws SearchFailure {
+    public Solution depthSearch() throws SearchFailure {
         Node node = new Node(this.problem.getInitialState(), null, null, 0);
         if (problem.goalTest(node.getState())) {
-            return node;
+            return new Solution(node);
         }
         LinkedList<Node> frontier = new LinkedList<Node>();
         frontier.add(node);
@@ -57,7 +57,7 @@ public class Searcher {
                 Node child = this.childNode(node, action);
                 if (!frontier.contains((child)) && !explored.contains(child.getState())) {
                     if (problem.goalTest(child.getState())) {
-                        return child;
+                        return new Solution(child);
                     }
                     frontier.addFirst(child);
                 }
@@ -65,42 +65,67 @@ public class Searcher {
         }
     }
 
-    public Node depthLimitedSearch(int limit) throws SearchFailure, SearchCutoff {
+    public Solution depthLimitedSearch(int limit, int level) throws SearchFailure, SearchCutoff {
         Node node = new Node(this.problem.getInitialState(), null, null, 0);
-        return recursiveDepthLimitedSearch(node, limit);
+        return recursiveDepthLimitedSearch(node, limit, level);
     }
 
-    private Node recursiveDepthLimitedSearch(Node node, int limit) throws SearchFailure, SearchCutoff {
+    private Solution recursiveDepthLimitedSearch(Node node, int limit, int level) throws SearchFailure, SearchCutoff {
         if (problem.goalTest(node.getState())) {
-            return node;
+            return new Solution(node, 0);
         } else if (limit == 0) {
-            throw new SearchCutoff();
+            throw new SearchCutoff(0);
         } else {
+            int statesGenerated = 0;
             boolean cutoffOccurred = false;
             ArrayList<Action> actions = this.problem.getActions(node);
             for (Action action: actions) {
                 Node child = this.childNode(node, action);
+                statesGenerated++;
                 try {
-                    return recursiveDepthLimitedSearch(child, limit - 1);
+                    Solution solution = recursiveDepthLimitedSearch(child, limit - 1, level);
+                    return new Solution(solution.getNode(), solution.getStatesGenerated() + statesGenerated);
                 } catch (SearchCutoff cutoff) {
                     cutoffOccurred = true;
-                } catch (SearchFailure failure) {}
+                    statesGenerated += cutoff.getStatesGenerated();
+                } catch (SearchFailure failure) {
+                    statesGenerated += failure.getStatesGenerated();
+                }
             }
             if (cutoffOccurred) {
-                throw new SearchCutoff();
+                throw new SearchCutoff(statesGenerated);
             } else {
-                throw new SearchFailure();
+                throw new SearchFailure(statesGenerated);
             }
         }
     }
 
-    public Node iterativeDeepeningSearch(int maxDepth) throws SearchFailure {
+    public Solution iterativeDeepeningSearch(int maxDepth) throws SearchFailure, SearchCutoff {
+       boolean cutoffOccurred = false;
+       int[] statesGenerated = new int[maxDepth];
+       Solution solution = null;
        for (int i = 0; i < maxDepth; i++) {
            try {
-               return depthLimitedSearch(i);
-           } catch (SearchCutoff | SearchFailure e) {}  // do not report failure until iteration completes
-        }
-        throw new SearchFailure();
+               solution = depthLimitedSearch(i, i);
+               statesGenerated[i] = solution.getStatesGenerated();
+               break; // solution found - break out of loop
+           } catch (SearchCutoff e) {
+               statesGenerated[i] = e.getStatesGenerated();
+               if (i + 1 == maxDepth) {
+                   cutoffOccurred = true; // report searchCutoff only if last iteration reached cutoff
+               }
+           }  catch (SearchFailure e) { // do not report failure until iteration completes
+               statesGenerated[i] = e.getStatesGenerated();
+           }
+       }
+
+       if (solution != null) {
+           return new Solution(solution.getNode(), statesGenerated);
+       }
+       if (cutoffOccurred) {
+        throw new SearchCutoff();
+       }
+       throw new SearchFailure();
     }
 
     private Node childNode(Node parent, Action action) {
