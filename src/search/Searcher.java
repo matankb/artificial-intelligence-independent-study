@@ -3,16 +3,26 @@ package search;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+// A generic Searcher class which accepts a generic SearchProblem
+// Can run breadth-first search, depth-first search, and recursive depth-limited search on a BasicSearchProblem
+// Can run Minimax search on an AdversarialSearchProblem
+// most of the search algorithms come from the book's pseudocode
 public class Searcher {
 
-    private Problem problem;
+    private SearchProblem problem;
+    private Player player;
 
-    public Searcher(Problem problem) {
+    public Searcher(SearchProblem problem) {
         this.problem = problem;
+    }
+    public Searcher(SearchProblem problem, Player player) {
+        this.problem = problem;
+        this.player = player;
     }
 
     public Solution breadthSearch() throws SearchFailure {
-        Node node = new Node(this.problem.getInitialState(), null, null, 0);
+        BasicSearchProblem problem = (BasicSearchProblem) this.problem;
+        Node node = new Node(problem.getInitialState(), null, null, 0);
         if (problem.goalTest(node.getState())) {
             return new Solution(node);
         }
@@ -25,7 +35,7 @@ public class Searcher {
             }
             node = frontier.pop();
             explored.add(node.getState());
-            ArrayList<Action> actions = problem.getActions(node);
+            ArrayList<Action> actions = problem.getActions(node.getState());
             for (Action action: actions) {
                 Node child = this.childNode(node, action);
                 if (!frontier.contains((child)) && !explored.contains(child.getState())) {
@@ -39,6 +49,7 @@ public class Searcher {
     }
 
     public Solution depthSearch() throws SearchFailure {
+        BasicSearchProblem problem = (BasicSearchProblem) this.problem;
         Node node = new Node(this.problem.getInitialState(), null, null, 0);
         if (problem.goalTest(node.getState())) {
             return new Solution(node);
@@ -52,7 +63,7 @@ public class Searcher {
             }
             node = frontier.removeLast();
             explored.add(node.getState());
-            ArrayList<Action> actions = problem.getActions(node);
+            ArrayList<Action> actions = problem.getActions(node.getState());
             for (Action action: actions) {
                 Node child = this.childNode(node, action);
                 if (!frontier.contains((child)) && !explored.contains(child.getState())) {
@@ -65,12 +76,13 @@ public class Searcher {
         }
     }
 
-    public Solution depthLimitedSearch(int limit, int level) throws SearchFailure, SearchCutoff {
+    public Solution depthLimitedSearch(int limit) throws SearchFailure, SearchCutoff {
         Node node = new Node(this.problem.getInitialState(), null, null, 0);
-        return recursiveDepthLimitedSearch(node, limit, level);
+        return recursiveDepthLimitedSearch(node, limit);
     }
 
-    private Solution recursiveDepthLimitedSearch(Node node, int limit, int level) throws SearchFailure, SearchCutoff {
+    private Solution recursiveDepthLimitedSearch(Node node, int limit) throws SearchFailure, SearchCutoff {
+        BasicSearchProblem problem = (BasicSearchProblem) this.problem;
         if (problem.goalTest(node.getState())) {
             return new Solution(node, 0);
         } else if (limit == 0) {
@@ -78,12 +90,12 @@ public class Searcher {
         } else {
             int statesGenerated = 0;
             boolean cutoffOccurred = false;
-            ArrayList<Action> actions = this.problem.getActions(node);
+            ArrayList<Action> actions = problem.getActions(node.getState());
             for (Action action: actions) {
                 Node child = this.childNode(node, action);
                 statesGenerated++;
                 try {
-                    Solution solution = recursiveDepthLimitedSearch(child, limit - 1, level);
+                    Solution solution = recursiveDepthLimitedSearch(child, limit - 1);
                     return new Solution(solution.getNode(), solution.getStatesGenerated() + statesGenerated);
                 } catch (SearchCutoff cutoff) {
                     cutoffOccurred = true;
@@ -106,7 +118,7 @@ public class Searcher {
        Solution solution = null;
        for (int i = 0; i < maxDepth; i++) {
            try {
-               solution = depthLimitedSearch(i, i);
+               solution = depthLimitedSearch(i);
                statesGenerated[i] = solution.getStatesGenerated();
                break; // solution found - break out of loop
            } catch (SearchCutoff e) {
@@ -129,7 +141,50 @@ public class Searcher {
     }
 
     private Node childNode(Node parent, Action action) {
-        return new Node(this.problem.result(parent.getState(), action), parent, action, parent.getPathCost() + problem.stepCost(parent.getState(), action));
+        BasicSearchProblem problem = (BasicSearchProblem) this.problem;
+        State result = this.problem.result(parent.getState(), action);
+        return new Node(result, parent, action, parent.getPathCost() + problem.stepCost(parent.getState(), action));
+    }
+
+    public Action minMaxSearch(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        ArrayList<Action> actions = problem.getActions(state);
+        double maxUtility = Double.NEGATIVE_INFINITY;
+        Action bestAction = null;
+        for (Action action: actions) {
+            double utility = this.minValue(this.problem.result(state, action));
+            if (utility > maxUtility) {
+                maxUtility = utility;
+                bestAction = action;
+            }
+        }
+        return bestAction;
+    }
+    private double maxValue(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (problem.terminalTest(state)) {
+            return problem.utility(state, this.player);
+        }
+        double value = Double.NEGATIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            value = Math.max(value, minValue(result));
+        }
+        return value;
+    }
+    private double minValue(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (problem.terminalTest(state)) {
+            return problem.utility(state, this.player);
+        }
+        double value = Double.POSITIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = problem.result(state, action);
+            value = Math.min(value, maxValue(result));
+        }
+        return value;
     }
 
 }

@@ -1,14 +1,11 @@
 package search.slide;
 
-import search.Action;
-import search.Node;
-import search.Problem;
-import search.State;
+import search.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SlideProblem implements Problem {
+public class SlideProblem implements BasicSearchProblem {
 
     private int[][] initialState = {
             {0, 0, 0, 0},
@@ -34,9 +31,9 @@ public class SlideProblem implements Problem {
     }
 
     @Override
-    public ArrayList<Action> getActions(Node n) {
+    public ArrayList<Action> getActions(State state) {
         ArrayList<Action> actions = new ArrayList<>();
-        int[][] board = ((SlideState) n.getState()).getState();
+        int[][] board = ((SlideState) state).getState();
         int[] blankCords = getBlankCords(board);
         int blankRow = blankCords[0];
         int blankCol = blankCords[1];

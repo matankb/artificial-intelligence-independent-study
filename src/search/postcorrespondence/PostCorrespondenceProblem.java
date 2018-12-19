@@ -1,13 +1,10 @@
 package search.postcorrespondence;
 
-import search.Action;
-import search.Node;
-import search.Problem;
-import search.State;
+import search.*;
 
 import java.util.ArrayList;
 
-public class PostCorrespondenceProblem implements Problem {
+public class PostCorrespondenceProblem implements BasicSearchProblem {
 
     private String[][] dominoes;
 
@@ -28,10 +25,10 @@ public class PostCorrespondenceProblem implements Problem {
     }
 
     @Override
-    public ArrayList<Action> getActions(Node n) {
+    public ArrayList<Action> getActions(State state) {
         ArrayList<Action> actions = new ArrayList<>();
         for (String[] domino: dominoes) {
-            String[] newDominoes = addDomino(((PostCorrespondenceState) n.getState()).getState(), domino);
+            String[] newDominoes = addDomino(((PostCorrespondenceState) state).getState(), domino);
             if (newDominoes[1].startsWith(newDominoes[0]) || newDominoes[0].startsWith(newDominoes[1])) {
                 PostCorrespondenceAction action = new PostCorrespondenceAction(domino);
                 actions.add(action);

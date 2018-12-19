@@ -1,3 +1,5 @@
+import search.tictactoe.TicTacToePlayer;
+import search.tictactoe.TicTacToeProblem;
 import search.*;
 import search.postcorrespondence.PostCorrespondenceProblem;
 import search.slide.SlideProblem;
@@ -16,6 +18,23 @@ class Main {
 
 
     public static void main(String[] args) {
+        demonstrateAdversarialSearch();
+        demonstrateBasicSearches();
+    }
+
+    // CHAPTER 5: ADVERSARIAL SEARCH
+    private static void demonstrateAdversarialSearch() {
+        TicTacToeProblem problem = new TicTacToeProblem();
+        TicTacToePlayer player = new TicTacToePlayer(TicTacToePlayer.PlayerType.X);
+        Searcher searcher = new Searcher(problem, player);
+        State state = problem.getInitialState();
+        Action action = searcher.minMaxSearch(state);
+        System.out.println("Player " + player.getPlayerType() + " should \"" + action + "\" when the board is:");
+        System.out.println(state);
+    }
+
+    // CHAPTER 3: SOLVING PROBLEMS BY SEARCHING
+    private static void demonstrateBasicSearches() {
         ArrayList<String> lines = getInputFileLines("postcorrespondence.txt");
         int maximumDepth = Integer.parseInt(lines.get(0));
         String[][] dominoes = parseDominoSet(lines);
@@ -23,8 +42,23 @@ class Main {
         SlideProblem slideProblem = new SlideProblem();
         PostCorrespondenceProblem postCorrespondenceProblem = new PostCorrespondenceProblem(dominoes);
 
-        runSearches("Slide Problem", slideProblem, maximumDepth, maximumDepth);
-        runSearches("Post Correspondence Problem", postCorrespondenceProblem, maximumDepth, maximumDepth);
+        runSearches("Slide BasicSearchProblem", slideProblem, maximumDepth, maximumDepth);
+        runSearches("Post Correspondence BasicSearchProblem", postCorrespondenceProblem, maximumDepth, maximumDepth);
+    }
+
+
+    // CHAPTER 3
+    private static void demonstratePriorityQueue() {
+        PriorityQueue<String> myQueue = new PriorityQueue<>(Comparator.<String>naturalOrder());
+        System.out.println(myQueue.isEmpty());
+        myQueue.insert("a");
+        myQueue.insert("c");
+        myQueue.insert("b");
+        System.out.println(myQueue.pop());
+        System.out.println(myQueue.pop());
+        myQueue.insert("z");
+        System.out.println(myQueue.pop());
+        System.out.println(myQueue.isEmpty());
     }
 
     // runs all search algorithms on the problem, printing results for each one
@@ -76,20 +110,6 @@ class Main {
             System.out.println("Level " + j + ": " + currentStatesGenerated + " states generated.");
             prevStatesGenerated = statesGenerated[j];
         }
-    }
-
-    // demonstration of PriorityQueue class
-    private static void runPriorityQueue() {
-        PriorityQueue<String> myQueue = new PriorityQueue<>(Comparator.<String>naturalOrder());
-        System.out.println(myQueue.isEmpty());
-        myQueue.insert("a");
-        myQueue.insert("c");
-        myQueue.insert("b");
-        System.out.println(myQueue.pop());
-        System.out.println(myQueue.pop());
-        myQueue.insert("z");
-        System.out.println(myQueue.pop());
-        System.out.println(myQueue.isEmpty());
     }
 
     private static String[][] parseDominoSet(ArrayList<String> lines) {
