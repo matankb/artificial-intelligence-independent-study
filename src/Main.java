@@ -28,15 +28,17 @@ class Main {
     }
 
     // runs all search algorithms on the problem, printing results for each one
-    private static void runSearches(String problemName, Problem problem, int maxDepth, int maxIterativeDepth) {
+    private static void runSearches(String problemName, BasicSearchProblem problem, int maxDepth, int maxIterativeDepth) {
         System.out.println(problemName.toUpperCase() + ":");
         Searcher searcher = new Searcher(problem);
 
         RunnableSearch iterativeDeepeningSearch = () -> searcher.iterativeDeepeningSearch(maxIterativeDepth);
         RunnableSearch breadthSearch = searcher::breadthSearch;
         RunnableSearch depthSearch = searcher::depthSearch;
+        RunnableSearch depthLimitedSearch = () -> searcher.depthLimitedSearch(maxDepth);
 
         printSearch("Iterative Deepening Search", iterativeDeepeningSearch);
+        printSearch("Depth-Limited Search", depthLimitedSearch);
         printSearch("Breadth-First Search", breadthSearch);
         printSearch("Depth-First Search", depthSearch);
         System.out.println("------------");

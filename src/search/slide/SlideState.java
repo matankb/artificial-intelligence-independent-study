@@ -17,10 +17,8 @@ public class SlideState implements State {
     }
 
     public boolean equals(Object otherState) {
-        if (!(otherState instanceof  SlideState)) {
-            return false;
-        }
-        return Arrays.deepEquals(((SlideState) otherState).getState(), state);
+        return (otherState instanceof SlideState) &&
+                Arrays.deepEquals(((SlideState) otherState).getState(), state);
     }
     public String toString() {
         StringBuilder str = new StringBuilder();
