@@ -1,8 +1,11 @@
+import search.mockgame.MockGamePlayer;
+import search.mockgame.MockGameProblem;
 import search.tictactoe.TicTacToePlayer;
 import search.tictactoe.TicTacToeProblem;
 import search.*;
 import search.postcorrespondence.PostCorrespondenceProblem;
 import search.slide.SlideProblem;
+import search.tictactoe.TicTacToeState;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,22 +18,58 @@ interface RunnableSearch {
 }
 
 class Main {
-
-
+    
     public static void main(String[] args) {
-        demonstrateAdversarialSearch();
-        demonstrateBasicSearches();
+        demonstrateAdversarialSearches();
     }
 
     // CHAPTER 5: ADVERSARIAL SEARCH
-    private static void demonstrateAdversarialSearch() {
+    private static void demonstrateAdversarialSearches() {
+        System.out.println("TIC-TAC-TOE");
         TicTacToeProblem problem = new TicTacToeProblem();
         TicTacToePlayer player = new TicTacToePlayer(TicTacToePlayer.PlayerType.X);
         Searcher searcher = new Searcher(problem, player);
-        State state = problem.getInitialState();
-        Action action = searcher.minMaxSearch(state);
-        System.out.println("Player " + player.getPlayerType() + " should \"" + action + "\" when the board is:");
-        System.out.println(state);
+        State state = new TicTacToeState(player, new TicTacToeState.CellType[][]{
+                {TicTacToeState.CellType.O, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.O},
+                {TicTacToeState.CellType.X, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY},
+                {TicTacToeState.CellType.O, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.O}
+        });
+
+        RunnableSearch minimaxSearch = () -> searcher.miniMaxSearch(state);
+        RunnableSearch alphaBetaSearch = () -> searcher.alphaBetaSearch(state);
+        RunnableSearch minimaxCutoffSearch = () -> searcher.minMaxCutoffSearch(state, 0);
+
+        long minimaxTime = runAdversarialSearch("Minimax", "" + player.getPlayerType(), minimaxSearch);
+        long alphaBetaTime = runAdversarialSearch("Alpha-Beta", "" + player.getPlayerType(), alphaBetaSearch);
+        float difference = (minimaxTime - alphaBetaTime) / 1000000;
+
+        System.out.printf("⌛ Alpha-Beta Search was %.0f milliseconds quicker (%.3f seconds) than regular Minimax\n", difference, difference / 1000);
+        runAdversarialSearch("Minimax Cutoff", "" + player.getPlayerType(), minimaxCutoffSearch);
+
+        System.out.println("\nMOCK MULTIPLAYER GAME");
+        MockGameProblem generalProblem = new MockGameProblem();
+        MockGamePlayer generalPlayer = new MockGamePlayer(MockGamePlayer.PlayerColor.BLUE);
+        State generalState = generalProblem.getInitialState();
+        Searcher generalSearcher = new Searcher(generalProblem, generalPlayer);
+
+        RunnableSearch generalSearch = () -> generalSearcher.generalMinimaxSearch(generalState);
+        runAdversarialSearch("General Search", " " + generalPlayer.getColor(), generalSearch);
+
+    }
+
+    // returns elapsed time
+    private static long runAdversarialSearch(String searchName, String playerName, RunnableSearch search) {
+        try {
+            long startTime = System.nanoTime();
+            Solution solution = search.runSearch();
+            long endTime = System.nanoTime();
+            Action action = solution.getAction();
+            System.out.println(searchName + " result: " + playerName + " should \"" + action + "\"");
+            return endTime - startTime;
+        } catch (SearchFailure | SearchCutoff e) {
+            // these errors will never throw
+            return 0;
+        }
     }
 
     // CHAPTER 3: SOLVING PROBLEMS BY SEARCHING
@@ -42,8 +81,8 @@ class Main {
         SlideProblem slideProblem = new SlideProblem();
         PostCorrespondenceProblem postCorrespondenceProblem = new PostCorrespondenceProblem(dominoes);
 
-        runSearches("Slide BasicSearchProblem", slideProblem, maximumDepth, maximumDepth);
-        runSearches("Post Correspondence BasicSearchProblem", postCorrespondenceProblem, maximumDepth, maximumDepth);
+        runSearches("Slide Problem", slideProblem, maximumDepth, maximumDepth);
+        runSearches("Post Correspondence Problem", postCorrespondenceProblem, maximumDepth, maximumDepth);
     }
 
 

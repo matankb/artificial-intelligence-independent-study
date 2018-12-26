@@ -20,6 +20,8 @@ public class Searcher {
         this.player = player;
     }
 
+    /* CHAPTER 3 */
+
     public Solution breadthSearch() throws SearchFailure {
         BasicSearchProblem problem = (BasicSearchProblem) this.problem;
         Node node = new Node(problem.getInitialState(), null, null, 0);
@@ -146,7 +148,9 @@ public class Searcher {
         return new Node(result, parent, action, parent.getPathCost() + problem.stepCost(parent.getState(), action));
     }
 
-    public Action minMaxSearch(State state) {
+    /* CHAPTER 5 */
+
+    public Solution miniMaxSearch(State state) {
         AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
         ArrayList<Action> actions = problem.getActions(state);
         double maxUtility = Double.NEGATIVE_INFINITY;
@@ -158,7 +162,7 @@ public class Searcher {
                 bestAction = action;
             }
         }
-        return bestAction;
+        return new Solution(bestAction);
     }
     private double maxValue(State state) {
         AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
@@ -185,6 +189,137 @@ public class Searcher {
             value = Math.min(value, maxValue(result));
         }
         return value;
+    }
+
+    public Solution alphaBetaSearch(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        ArrayList<Action> actions = problem.getActions(state);
+        double maxUtility = Double.NEGATIVE_INFINITY;
+        Action bestAction = null;
+        for (Action action: actions) {
+            double utility = this.alphaBetaMinValue(this.problem.result(state, action), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+            if (utility > maxUtility) {
+                maxUtility = utility;
+                bestAction = action;
+            }
+        }
+        return new Solution(bestAction);
+    }
+    private double alphaBetaMaxValue(State state, double alpha, double beta) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (problem.terminalTest(state)) {
+            return problem.utility(state, this.player);
+        }
+        double value = Double.NEGATIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            value = Math.max(value, alphaBetaMinValue(result, alpha, beta));
+            if (value >= beta) {
+                return value;
+            }
+            alpha = Math.max(alpha, value);
+        }
+        return value;
+    }
+    private double alphaBetaMinValue(State state, double alpha, double beta) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (problem.terminalTest(state)) {
+            return problem.utility(state, this.player);
+        }
+        double value = Double.POSITIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            value = Math.min(value, alphaBetaMaxValue(result, alpha, beta));
+            if (value <= alpha) {
+                return value;
+            }
+            beta = Math.min(beta, value);
+        }
+        return value;
+    }
+
+    public Solution minMaxCutoffSearch(State state, double maxDepth) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        ArrayList<Action> actions = problem.getActions(state);
+        double maxUtility = Double.NEGATIVE_INFINITY;
+        Action bestAction = null;
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            double utility = this.minValueCutoff(result, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, maxDepth);
+            if (utility > maxUtility) {
+                maxUtility = utility;
+                bestAction = action;
+            }
+        }
+        return new Solution(bestAction);
+    }
+    private double maxValueCutoff(State state, double alpha, double beta, double depth) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (cutoffTest(state, depth)) {
+            return problem.eval(state, this.player);
+        }
+        double value = Double.NEGATIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            value = Math.max(value, minValueCutoff(result, alpha, beta, depth - 1));
+            if (value >= beta) {
+                return value;
+            }
+            alpha = Math.max(alpha, value);
+        }
+        return value;
+    }
+    private double minValueCutoff(State state, double alpha, double beta, double depth) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (cutoffTest(state, depth)) {
+            return problem.eval(state, this.player);
+        }
+        double value = Double.POSITIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = this.problem.result(state, action);
+            value = Math.min(value, maxValueCutoff(result, alpha, beta, depth - 1));
+            if (value <= alpha) {
+                return value;
+            }
+            beta = Math.min(beta, value);
+        }
+        return value;
+    }
+    private boolean cutoffTest(State state, double depth) {
+        return depth == 0;
+    }
+
+    public Solution generalMinimaxSearch(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        ArrayList<Action> actions = problem.getActions(state);
+        double max = Double.NEGATIVE_INFINITY;
+        Action bestAction = null;
+        for (Action action: actions) {
+            double worstUtility = worstCaseUtility(problem.result(state, action));
+            if (worstUtility > max) {
+                max = worstUtility;
+                bestAction = action;
+            }
+        }
+        return new Solution(bestAction);
+    }
+    private double worstCaseUtility(State state) {
+        AdversarialSearchProblem problem = (AdversarialSearchProblem) this.problem;
+        if (problem.terminalTest(state)) {
+            return problem.utility(state, this.player);
+        }
+        double minVal = Double.POSITIVE_INFINITY;
+        ArrayList<Action> actions = problem.getActions(state);
+        for (Action action: actions) {
+            State result = problem.result(state, action);
+            double resultMin = worstCaseUtility(result);
+            minVal = Math.min(minVal, resultMin);
+        }
+        return minVal;
     }
 
 }

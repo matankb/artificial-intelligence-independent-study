@@ -71,6 +71,17 @@ public class TicTacToeProblem implements AdversarialSearchProblem {
         return 0; // loss
     }
 
+    @Override
+    public double eval(State state, Player p) {
+        if (this.terminalTest(state)) {
+            return this.utility(state, p);
+        } else {
+            TicTacToeState gameState = (TicTacToeState) state;
+            TicTacToePlayer gamePlayer = (TicTacToePlayer) gameState.getCurrentPlayer();
+            return gamePlayer.getPlayerType() == ((TicTacToePlayer) p).getPlayerType() ? 2 : 0;
+        }
+    }
+
     private boolean isBoardFull(TicTacToeState state) {
         TicTacToeState.CellType[][] board =  state.getBoard();
         for (int i = 0; i < board.length; i++) {
@@ -90,9 +101,11 @@ public class TicTacToeProblem implements AdversarialSearchProblem {
             TicTacToeState.CellType[] row = board[i];
             if (row[0] == row[1] && row[1] == row[2]) {
                 winner = row[0];
+                break;
             }
             if (board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
                 winner = board[0][i];
+                break;
             }
         }
         if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
