@@ -312,14 +312,13 @@ public class Searcher {
         if (problem.terminalTest(state)) {
             return problem.utility(state, this.player);
         }
-        double minVal = Double.POSITIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
         ArrayList<Action> actions = problem.getActions(state);
         for (Action action: actions) {
             State result = problem.result(state, action);
-            double resultMin = worstCaseUtility(result);
-            minVal = Math.min(minVal, resultMin);
+            min = Math.min(min, worstCaseUtility(result));
         }
-        return minVal;
+        return min;
     }
 
 }

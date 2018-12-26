@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class PriorityQueue<T> {
+class PriorityQueue<T> {
 
     final private ArrayList<T> queue;
     final private Comparator<T> comparator;

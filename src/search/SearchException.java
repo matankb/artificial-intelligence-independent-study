@@ -1,6 +1,6 @@
 package search;
 
-public class SearchException extends Exception {
+class SearchException extends Exception {
     private int statesGenerated = 0; // used for DLS
 
     SearchException() {}

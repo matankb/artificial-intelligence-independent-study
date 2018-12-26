@@ -3,7 +3,7 @@ package search.mockgame;
 import search.Action;
 
 public class MockGameAction implements Action {
-    public enum Direction { RIGHT, LEFT };
+    public enum Direction { RIGHT, LEFT }
 
     private Direction direction;
     public MockGameAction(Direction direction) {

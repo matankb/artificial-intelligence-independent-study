@@ -7,9 +7,6 @@ import search.postcorrespondence.PostCorrespondenceProblem;
 import search.slide.SlideProblem;
 import search.tictactoe.TicTacToeState;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -18,7 +15,7 @@ interface RunnableSearch {
 }
 
 class Main {
-    
+
     public static void main(String[] args) {
         demonstrateAdversarialSearches();
     }
@@ -32,13 +29,14 @@ class Main {
         State state = new TicTacToeState(player, new TicTacToeState.CellType[][]{
                 {TicTacToeState.CellType.O, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.O},
                 {TicTacToeState.CellType.X, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY},
-                {TicTacToeState.CellType.O, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.O}
+                {TicTacToeState.CellType.O, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY}
         });
 
         RunnableSearch minimaxSearch = () -> searcher.miniMaxSearch(state);
         RunnableSearch alphaBetaSearch = () -> searcher.alphaBetaSearch(state);
         RunnableSearch minimaxCutoffSearch = () -> searcher.minMaxCutoffSearch(state, 0);
 
+        System.out.println(state);
         long minimaxTime = runAdversarialSearch("Minimax", "" + player.getPlayerType(), minimaxSearch);
         long alphaBetaTime = runAdversarialSearch("Alpha-Beta", "" + player.getPlayerType(), alphaBetaSearch);
         float difference = (minimaxTime - alphaBetaTime) / 1000000;
@@ -74,7 +72,7 @@ class Main {
 
     // CHAPTER 3: SOLVING PROBLEMS BY SEARCHING
     private static void demonstrateBasicSearches() {
-        ArrayList<String> lines = getInputFileLines("postcorrespondence.txt");
+        ArrayList<String> lines = Util.getInputFileLines("postcorrespondence.txt");
         int maximumDepth = Integer.parseInt(lines.get(0));
         String[][] dominoes = parseDominoSet(lines);
 
@@ -160,16 +158,6 @@ class Main {
             set[i] = new String[]{parts[1], parts[2]};
         }
         return set;
-    }
-
-    private static ArrayList<String> getInputFileLines(String fileName) {
-        ArrayList<String> lines = new ArrayList<String>();
-        try {
-            Files.lines(Paths.get("./input/" + fileName)).forEach(lines::add);
-        }  catch (IOException e) {
-            System.out.println("Error reading post correspondence input file");
-        }
-        return lines;
     }
 
 }
