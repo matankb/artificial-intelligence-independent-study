@@ -1,11 +1,11 @@
-package search.slide;
+package search.problems.slide;
 
 import search.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SlideProblem implements BasicSearchProblem {
+public class SlideProblem implements BasicSearchProblem<SlideState, SlideAction> {
 
     private int[][] initialState = {
             {0, 0, 0, 0},
@@ -26,13 +26,13 @@ public class SlideProblem implements BasicSearchProblem {
     }
 
     @Override
-    public boolean goalTest(State state) {
+    public boolean goalTest(SlideState state) {
         return Arrays.deepEquals(((SlideState) state).getState(), goalState);
     }
 
     @Override
-    public ArrayList<Action> getActions(State state) {
-        ArrayList<Action> actions = new ArrayList<>();
+    public ArrayList<SlideAction> getActions(SlideState state) {
+        ArrayList<SlideAction> actions = new ArrayList<>();
         int[][] board = ((SlideState) state).getState();
         int[] blankCords = getBlankCords(board);
         int blankRow = blankCords[0];
@@ -53,7 +53,7 @@ public class SlideProblem implements BasicSearchProblem {
     }
 
     @Override
-    public SlideState result(State parentState, Action action) {
+    public SlideState result(SlideState parentState, SlideAction action) {
         SlideAction slideAction = (SlideAction) action;
         SlideState slideParentState = (SlideState) parentState;
         int[][] board = slideParentState.getState();
@@ -83,7 +83,7 @@ public class SlideProblem implements BasicSearchProblem {
     }
 
     @Override
-    public int stepCost(State parentState, Action action) {
+    public int stepCost(SlideState parentState, SlideAction action) {
         return 1;
     }
 

@@ -1,11 +1,11 @@
-package search.mockgame;
+package search.problems.mockgame;
 
 import search.Action;
 
 public class MockGameAction implements Action {
     public enum Direction { RIGHT, LEFT }
 
-    private Direction direction;
+    private final Direction direction;
     public MockGameAction(Direction direction) {
         this.direction = direction;
     }

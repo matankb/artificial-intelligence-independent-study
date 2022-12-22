@@ -1,15 +1,14 @@
-package search.tictactoe;
+package search.problems.tictactoe;
 
-import search.Player;
 import search.State;
 
 public class TicTacToeState implements State {
     public enum CellType { X, O, EMPTY }
 
     private CellType[][] board;
-    private Player player;
+    private TicTacToePlayer player;
 
-    public TicTacToeState(Player player, CellType[][] board) {
+    public TicTacToeState(TicTacToePlayer player, CellType[][] board) {
         this.player = player;
         this.board = board;
     }
@@ -17,7 +16,7 @@ public class TicTacToeState implements State {
     public CellType[][] getBoard() {
         return board;
     }
-    public Player getCurrentPlayer() {
+    public TicTacToePlayer getCurrentPlayer() {
         return player;
     }
 

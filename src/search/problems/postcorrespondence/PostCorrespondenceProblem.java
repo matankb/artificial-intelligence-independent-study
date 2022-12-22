@@ -1,10 +1,10 @@
-package search.postcorrespondence;
+package search.problems.postcorrespondence;
 
 import search.*;
 
 import java.util.ArrayList;
 
-public class PostCorrespondenceProblem implements BasicSearchProblem {
+public class PostCorrespondenceProblem implements BasicSearchProblem<PostCorrespondenceState, PostCorrespondenceAction> {
 
     private String[][] dominoes;
 
@@ -14,19 +14,19 @@ public class PostCorrespondenceProblem implements BasicSearchProblem {
     }
 
     @Override
-    public State getInitialState() {
+    public PostCorrespondenceState getInitialState() {
         return new PostCorrespondenceState(new String[]{"", ""}); // empty dominoes
     }
 
     @Override
-    public boolean goalTest(State s) {
+    public boolean goalTest(PostCorrespondenceState s) {
         String[] strings = ((PostCorrespondenceState) s).getState();
         return !strings[0].isEmpty() && strings[0].equals(strings[1]);
     }
 
     @Override
-    public ArrayList<Action> getActions(State state) {
-        ArrayList<Action> actions = new ArrayList<>();
+    public ArrayList<PostCorrespondenceAction> getActions(PostCorrespondenceState state) {
+        ArrayList<PostCorrespondenceAction> actions = new ArrayList<>();
         for (String[] domino: dominoes) {
             String[] newDominoes = addDomino(((PostCorrespondenceState) state).getState(), domino);
             if (newDominoes[1].startsWith(newDominoes[0]) || newDominoes[0].startsWith(newDominoes[1])) {
@@ -38,15 +38,14 @@ public class PostCorrespondenceProblem implements BasicSearchProblem {
     }
 
     @Override
-    public State result(State parentState, Action action) {
-        PostCorrespondenceState state = (PostCorrespondenceState) parentState;
-        String[] addedDomino = ((PostCorrespondenceAction) action).getDomino();
+    public PostCorrespondenceState result(PostCorrespondenceState state, PostCorrespondenceAction action) {
+        String[] addedDomino = action.getDomino();
         String[] newDominoes = addDomino(state.getState(), addedDomino);
         return new PostCorrespondenceState(newDominoes);
     }
 
     @Override
-    public int stepCost(State parentState, Action action) {
+    public int stepCost(PostCorrespondenceState parentState, PostCorrespondenceAction action) {
         return 0;
     }
 

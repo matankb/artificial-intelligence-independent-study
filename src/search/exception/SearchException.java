@@ -1,4 +1,4 @@
-package search;
+package search.exception;
 
 class SearchException extends Exception {
     private int statesGenerated = 0; // used for DLS
@@ -8,7 +8,7 @@ class SearchException extends Exception {
         this.statesGenerated = statesGenerated;
     }
 
-    int getStatesGenerated() {
+    public int getStatesGenerated() {
         return statesGenerated;
     }
 }

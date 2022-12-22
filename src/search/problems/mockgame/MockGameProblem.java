@@ -1,9 +1,6 @@
-package search.mockgame;
+package search.problems.mockgame;
 
-import search.Action;
 import search.AdversarialSearchProblem;
-import search.Player;
-import search.State;
 
 import java.util.ArrayList;
 
@@ -24,26 +21,26 @@ import java.util.ArrayList;
  * 5: [3, 2]
  * 6: [3, 3]
  */
-public class MockGameProblem implements AdversarialSearchProblem {
+public class MockGameProblem implements AdversarialSearchProblem<MockGameState, MockGameAction, MockGamePlayer> {
     @Override
-    public State getInitialState() {
+    public MockGameState getInitialState() {
         return new MockGameState(0);
     }
 
     @Override
-    public ArrayList<Action> getActions(State state) {
-        int index = ((MockGameState) state).getIndex();
-        if (index >= 3) return new ArrayList<Action>();
-        ArrayList<Action> actions = new ArrayList<Action>();
+    public ArrayList<MockGameAction> getActions(MockGameState state) {
+        int index = state.getIndex();
+        if (index >= 3) return new ArrayList<>();
+        ArrayList<MockGameAction> actions = new ArrayList<>();
         actions.add(new MockGameAction(MockGameAction.Direction.RIGHT));
         actions.add(new MockGameAction(MockGameAction.Direction.LEFT));
         return actions;
     }
 
     @Override
-    public State result(State parentState, Action action) {
-        int index = ((MockGameState) parentState).getIndex();
-        MockGameAction.Direction direction = ((MockGameAction) action).getDirection();
+    public MockGameState result(MockGameState parentState, MockGameAction action) {
+        int index = parentState.getIndex();
+        MockGameAction.Direction direction = action.getDirection();
         boolean isLeft = direction == MockGameAction.Direction.LEFT;
         switch (index) {
             case 0:
@@ -60,15 +57,15 @@ public class MockGameProblem implements AdversarialSearchProblem {
     }
 
     @Override
-    public boolean terminalTest(State state) {
-        int index = ((MockGameState) state).getIndex();
+    public boolean terminalTest(MockGameState state) {
+        int index = state.getIndex();
         return index >= 3;
     }
 
     @Override
-    public double utility(State state, Player p) {
-        int index = ((MockGameState) state).getIndex();
-        MockGamePlayer.PlayerColor color = ((MockGamePlayer) p).getColor();
+    public double utility(MockGameState state, MockGamePlayer p) {
+        int index = state.getIndex();
+        MockGamePlayer.PlayerColor color = p.getColor();
         boolean isRed = color == MockGamePlayer.PlayerColor.RED;
         switch (index) {
             case 3:
@@ -89,7 +86,7 @@ public class MockGameProblem implements AdversarialSearchProblem {
     }
 
     @Override
-    public double eval(State state, Player p) {
+    public double eval(MockGameState state, MockGamePlayer p) {
         return 0;
     }
 }

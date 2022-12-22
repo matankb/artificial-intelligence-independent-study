@@ -1,11 +1,11 @@
-package search.mockgame;
+package search.problems.mockgame;
 
 import search.State;
 
-class MockGameState implements State {
+public class MockGameState implements State {
     private int index;
 
-    MockGameState(int index) {
+    public MockGameState(int index) {
         this.index = index;
     }
 

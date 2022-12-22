@@ -1,4 +1,4 @@
-package search.tictactoe;
+package search.problems.tictactoe;
 import search.Action;
 
 public class TicTacToeAction implements Action {

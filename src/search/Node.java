@@ -1,20 +1,20 @@
 package search;
 
-public class Node {
+public class Node<StateType extends State> {
 
-    private final State state;
-    private final Node parent;
+    private final StateType state;
+    private final Node<StateType> parent;
     private final Action action;
     private final int pathCost;
 
-    public Node(State state, Node parent, Action action, int pathCost) {
+    public Node(StateType state, Node<StateType> parent, Action action, int pathCost) {
         this.state = state;
         this.parent = parent;
         this.action = action;
         this.pathCost = pathCost;
     }
 
-    public State getState() {
+    public StateType getState() {
         return state;
     }
     public Node getParent() {

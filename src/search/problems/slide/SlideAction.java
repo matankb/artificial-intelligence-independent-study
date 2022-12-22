@@ -1,4 +1,4 @@
-package search.slide;
+package search.problems.slide;
 
 import search.Action;
 

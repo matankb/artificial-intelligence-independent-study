@@ -1,4 +1,4 @@
-package search.mockgame;
+package search.problems.mockgame;
 
 import search.Player;
 

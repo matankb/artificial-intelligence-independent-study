@@ -1,16 +1,13 @@
-package search.tictactoe;
+package search.problems.tictactoe;
 
-import search.Action;
 import search.AdversarialSearchProblem;
-import search.Player;
-import search.State;
 
 import java.util.ArrayList;
 
-public class TicTacToeProblem implements AdversarialSearchProblem {
+public class TicTacToeProblem implements AdversarialSearchProblem<TicTacToeState, TicTacToeAction, TicTacToePlayer> {
 
     @Override
-    public State getInitialState() {
+    public TicTacToeState getInitialState() {
         return new TicTacToeState(new TicTacToePlayer(TicTacToePlayer.PlayerType.X), new TicTacToeState.CellType[][]{
             {TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY},
             {TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY, TicTacToeState.CellType.EMPTY},
@@ -19,9 +16,9 @@ public class TicTacToeProblem implements AdversarialSearchProblem {
     }
 
     @Override
-    public ArrayList<Action> getActions(State state) {
-        TicTacToeState.CellType[][] board = ((TicTacToeState) state).getBoard();
-        ArrayList<Action> actions = new ArrayList<>();
+    public ArrayList<TicTacToeAction> getActions(TicTacToeState state) {
+        TicTacToeState.CellType[][] board = state.getBoard();
+        ArrayList<TicTacToeAction> actions = new ArrayList<>();
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == TicTacToeState.CellType.EMPTY) {
@@ -33,12 +30,11 @@ public class TicTacToeProblem implements AdversarialSearchProblem {
     }
 
     @Override
-    public State result(State state, Action action) {
-        TicTacToeState gameState = (TicTacToeState) state;
-        TicTacToePlayer player = (TicTacToePlayer) gameState.getCurrentPlayer();
-        TicTacToeState.CellType[][] board = cloneBoard(((TicTacToeState) state).getBoard());
-        int[] position = ((TicTacToeAction) action).getPosition();
-        Player nextPlayer = null;
+    public TicTacToeState result(TicTacToeState state, TicTacToeAction action) {
+        TicTacToePlayer player = state.getCurrentPlayer();
+        TicTacToeState.CellType[][] board = cloneBoard(state.getBoard());
+        int[] position = action.getPosition();
+        TicTacToePlayer nextPlayer = null;
         switch (player.getPlayerType()) {
             case X:
                 board[position[0]][position[1]] = TicTacToeState.CellType.X;
@@ -53,42 +49,39 @@ public class TicTacToeProblem implements AdversarialSearchProblem {
     }
 
     @Override
-    public boolean terminalTest(State state) {
-        TicTacToeState gameState = (TicTacToeState) state;
-        return isBoardFull(gameState) || getWinnerCellType(gameState) != null;
+    public boolean terminalTest(TicTacToeState state) {
+        return isBoardFull(state) || getWinnerCellType(state) != null;
     }
 
     @Override
-    public double utility(State state, Player p) {
-        TicTacToeState.CellType cellType = getWinnerCellType((TicTacToeState) state);
+    public double utility(TicTacToeState state, TicTacToePlayer p) {
+        TicTacToeState.CellType cellType = getWinnerCellType(state);
         if (cellType == null) {
             return 1; // tie;
         }
         TicTacToePlayer.PlayerType playerType = cellTypeToPlayerType(cellType);
-        if (playerType == ((TicTacToePlayer) p).getPlayerType()) {
+        if (playerType == p.getPlayerType()) {
             return 2; // win
         }
         return 0; // loss
     }
 
     @Override
-    public double eval(State state, Player p) {
+    public double eval(TicTacToeState state, TicTacToePlayer p) {
         if (this.terminalTest(state)) {
             return this.utility(state, p);
         } else {
-            TicTacToeState gameState = (TicTacToeState) state;
-            TicTacToePlayer gamePlayer = (TicTacToePlayer) gameState.getCurrentPlayer();
-            return gamePlayer.getPlayerType() == ((TicTacToePlayer) p).getPlayerType() ? 2 : 0;
+            return state.getCurrentPlayer().getPlayerType() == p.getPlayerType() ? 2 : 0;
         }
     }
 
     private boolean isBoardFull(TicTacToeState state) {
         TicTacToeState.CellType[][] board =  state.getBoard();
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                 if (board[i][j] == TicTacToeState.CellType.EMPTY) {
-                     return false;
-                 }
+        for (TicTacToeState.CellType[] row : board) {
+            for (TicTacToeState.CellType cell : row) {
+                if (cell == TicTacToeState.CellType.EMPTY) {
+                    return false;
+                }
             }
         }
         return true;
